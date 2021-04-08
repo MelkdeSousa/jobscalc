@@ -4,25 +4,20 @@ const JobModel = require('../models/Job')
 const JobLib = require('../lib/Job')
 
 module.exports = {
-  create(req, res) {
-    const jobs = JobModel.get()
-
-    const lastId = jobs.length ? jobs.length + 1 : 1
-
+  async create(req, res) {
     const job = {
       ...req.body,
       createdAt: Date.now(),
-      id: lastId,
     }
 
-    JobModel.create(job)
+    await JobModel.create(job)
 
     return res.redirect('/')
   },
 
-  show(req, res) {
-    const jobs = JobModel.get()
-    const profile = ProfileModel.get()
+  async show(req, res) {
+    const jobs = await JobModel.get()
+    const profile = await ProfileModel.get()
 
     const jobId = req.params.id
 
@@ -37,41 +32,24 @@ module.exports = {
     return res.render('job-edit', { job })
   },
 
-  update(req, res) {
-    const jobs = JobModel.get()
-
+  async update(req, res) {
     const jobId = req.params.id
 
-    const job = jobs.find(job => Number(job.id) === Number(jobId))
-
-    if (!job) {
-      return res.redirect('/')
-    }
-
     const updatedJob = {
-      ...job,
       name: req.body.name,
       'total-hours': Number(req.body['total-hours']),
       'daily-hours': Number(req.body['daily-hours']),
     }
 
-    const newJobs = jobs.map(job => {
-      if (Number(job.id) === Number(jobId)) {
-        return updatedJob
-      }
-
-      return job
-    })
-
-    JobModel.update(newJobs)
+    await JobModel.update(updatedJob, jobId)
 
     res.redirect(`/job/${jobId}`)
   },
 
-  delete(req, res) {
+  async delete(req, res) {
     const jobId = req.params.id
 
-    JobModel.delete(jobId)
+    await JobModel.delete(jobId)
 
     return res.redirect('/')
   },

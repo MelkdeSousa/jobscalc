@@ -4,9 +4,9 @@ const ProfileModel = require('../models/Profile')
 const JobLib = require('../lib/Job')
 
 module.exports = {
-  index(req, res) {
-    const jobs = JobModel.get()
-    const profile = ProfileModel.get()
+  async index(req, res) {
+    const jobs = await JobModel.get()
+    const profile = await ProfileModel.get()
 
     const statusJobs = {
       total: jobs.length,
